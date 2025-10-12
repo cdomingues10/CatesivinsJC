@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "387650238600",
+    "project_id": "catesivinsjc",
+    "storage_bucket": "catesivinsjc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387650238600:android:2a7963b914339b7a45073d",
+        "android_client_info": {
+          "package_name": "com.christian.catesivinsjc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH3CsUSB7vALGDkc0OFocO0A8hpJ_gX7c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
