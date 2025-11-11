@@ -12,4 +12,6 @@ data class Vi(
     var Nom: String = "",
     var Tipus: String = "",
     val Varietat: String = "",
+
+    val bodegaId: String = "",
 )
