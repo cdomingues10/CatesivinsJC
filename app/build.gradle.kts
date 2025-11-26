@@ -60,6 +60,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+// Ensure this is a recent version
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
     implementation(platform(libs.firebase.bom))

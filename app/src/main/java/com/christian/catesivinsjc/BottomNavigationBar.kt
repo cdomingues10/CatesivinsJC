@@ -1,5 +1,6 @@
 package com.christian.catesivinsjc
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -11,46 +12,54 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.christian.catesivinsjc.ui.theme.colorVi
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     NavigationBar {
+        val items = listOf("Home", "Mapa", "Perfil")
+        val icons = listOf(Icons.Default.Home, Icons.Default.Place, Icons.Default.Person)
+        val routes = listOf("home", "mapa", "perfil")
+
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
-        // Definim els colors per als elements de la barra de navegació
-        val itemColors = NavigationBarItemDefaults.colors(
-            selectedIconColor = colorVi,           // El teu color per a la icona seleccionada
-            unselectedIconColor = Color.Gray,      // Un color neutre per a les no seleccionades
-            selectedTextColor = colorVi,           // El teu color per al text seleccionat
-            unselectedTextColor = Color.Gray       // Un color neutre per al text no seleccionat
-        )
-
-        NavigationBarItem(
-            selected = currentRoute == "home",
-            onClick = { navController.navigate("home") },
-            label = { Text(stringResource(R.string.bottom_nav_home)) },
-            icon = { Icon(Icons.Filled.Home, contentDescription = null) },
-            colors = itemColors
-        )
-        NavigationBarItem(
-            selected = currentRoute == "mapa",
-            onClick = { navController.navigate("mapa") },
-            label = { Text(stringResource(R.string.bottom_nav_mapa)) },
-            icon = { Icon(Icons.Filled.Place, contentDescription = null) },
-            colors = itemColors
-        )
-        NavigationBarItem(
-            selected = currentRoute == "perfil",
-            onClick = { navController.navigate("perfil") },
-            label = { Text(stringResource(R.string.bottom_nav_perfil)) },
-            icon = { Icon(Icons.Filled.Person, contentDescription = null) },
-            colors = itemColors
-        )
+        items.forEachIndexed { index, item ->
+            val isSelected = currentRoute == routes[index]
+            
+            NavigationBarItem(
+                // Icona més gran utilitzant Modifier.size
+                icon = { 
+                    Icon(
+                        imageVector = icons[index], 
+                        contentDescription = item,
+                        modifier = Modifier.size(32.dp) // Augmentem la mida a 32dp
+                    ) 
+                },
+                label = { Text(item) },
+                selected = isSelected,
+                colors = NavigationBarItemDefaults.colors(
+                    // Només canviem el color dels elements SELECCIONATS pel nou color Bordeus
+                    selectedIconColor = colorResource(id = R.color.bordeaux),
+                    selectedTextColor = colorResource(id = R.color.bordeaux),
+                    // També posem l'indicador (la pastilla de fons) del mateix color però transparent
+                    indicatorColor = colorResource(id = R.color.bordeaux).copy(alpha = 0.1f)
+                ),
+                onClick = {
+                    navController.navigate(routes[index]) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
     }
 }

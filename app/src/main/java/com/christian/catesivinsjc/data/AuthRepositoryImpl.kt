@@ -1,45 +1,58 @@
 package com.christian.catesivinsjc.data
 
 import com.christian.catesivinsjc.domain.AuthRepository
+import com.christian.catesivinsjc.model.Usuari
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 class AuthRepositoryImpl(
-    // Injectem la instància de FirebaseAuth
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : AuthRepository {
 
-    override val currentUser: FirebaseUser?
-        get() = auth.currentUser
-
-    override suspend fun register(email: String, password: String): Result<Unit> {
+    override suspend fun register(email: String, password: String): Result<FirebaseUser?> {
         return try {
-            // Cridem a la funció de Firebase per crear l'usuari
-            auth.createUserWithEmailAndPassword(email, password).await()
-            // Si no hi ha hagut cap excepció, l'operació ha estat un èxit
-            Result.success(Unit)
+            // 1. Creem l'usuari a Authentication
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = authResult.user
+
+            // 2. Si va bé, guardem a Firestore a la col·lecció "Usuari" (amb majúscula)
+            if (user != null) {
+                val nouUsuari = Usuari(
+                    userId = user.uid,
+                    email = email,
+                    nom = "", // Deixem buit
+                    rol = "usuari", // Valor per defecte del teu model
+                    fotoUrl = ""
+                )
+
+                // Guardem l'objecte directament. Firestore farà el mapatge automàticament.
+                firestore.collection("Usuari").document(user.uid).set(nouUsuari).await()
+            }
+            Result.success(user)
         } catch (e: Exception) {
-            // Si Firebase llança una excepció, la capturem i la retornem com un error
             Result.failure(e)
         }
     }
 
-    override suspend fun login(email: String, password: String): Result<Unit> {
+    override fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
+    }
+
+    override suspend fun getUserProfile(uid: String): Result<Usuari?> {
         return try {
-            auth.signInWithEmailAndPassword(email, password).await()
-            Result.success(Unit)
+            // Llegim de la col·lecció "Usuari"
+            val snapshot = firestore.collection("Usuari").document(uid).get().await()
+            val usuari = snapshot.toObject(Usuari::class.java)
+            Result.success(usuari)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun logout() {
-        try {
-            auth.signOut()
-        } catch (e: Exception) {
-            // El signOut normalment no falla, però és bona pràctica
-            e.printStackTrace()
-        }
+    override fun logout() {
+        auth.signOut()
     }
 }
