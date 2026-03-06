@@ -4,6 +4,7 @@ import android.util.Log
 import com.christian.catesivinsjc.domain.CataRepository
 import com.christian.catesivinsjc.model.Cata
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -28,33 +29,44 @@ class CataRepositoryImpl(
                 }
 
                 if (snapshot != null) {
-                    // Llancem una coroutine per fer la feina "pesada" de buscar els noms
                     launch {
+                        // 1. Convertim documents a objectes Cata protegint-nos d'errors de format
                         val catesList = snapshot.documents.mapNotNull { document ->
-                            document.toObject(Cata::class.java)
+                            try {
+                                document.toObject(Cata::class.java)?.apply {
+                                    // Guardem l'ID del document manualment per si de cas
+                                    cataId = document.id 
+                                }
+                            } catch (e: Exception) {
+                                Log.e("CataRepository", "Error llegint cata ${document.id}: ${e.message}")
+                                null
+                            }
                         }
 
-                        // Ara recorrem la llista i busquem el nom i l'adreça de la bodega
+                        // 2. Omplim la informació de les Bodegues
                         val catesCompletades = catesList.map { cata ->
                             if (cata.ubicacio != null) {
                                 try {
-                                    // Esperem (await) a tenir la dada de la bodega
                                     val bodegaSnapshot = cata.ubicacio!!.get().await()
                                     
-                                    // Recuperem el NOM (comercial) i la UBICACIÓ (adreça)
-                                    val nomBodega = bodegaSnapshot.getString("nom") ?: "Nom desconegut"
-                                    val direccioBodega = bodegaSnapshot.getString("ubicacio") ?: "Adreça desconeguda"
-                                    
-                                    // Modifiquem els camps temporals
+                                    // RECORDA: Aquí has de posar els noms EXACTES de la teva BD
+                                    // Si a Firestore és "Nom", posa "Nom". Si és "nom", posa "nom".
+                                    val nomBodega = bodegaSnapshot.getString("Nom") ?: "Nom desconegut"
+                                    val direccioBodega = bodegaSnapshot.getString("Ubicacio") ?: "Adreça desconeguda"
+                                    val geo = bodegaSnapshot.getGeoPoint("Geo") ?: GeoPoint(0.0, 0.0)
+
+
                                     cata.apply { 
                                         this.nomBodega = nomBodega 
                                         this.direccioBodega = direccioBodega
+                                        this.coordenades = geo
                                     }
                                 } catch (e: Exception) {
                                     Log.e("CataRepository", "Error buscant bodega: ${e.message}")
                                     cata.apply { 
-                                        this.nomBodega = "Error" 
+                                        this.nomBodega = "Error connexió" 
                                         this.direccioBodega = ""
+                                        this.coordenades = GeoPoint(0.0, 0.0)
                                     }
                                 }
                             } else {
@@ -65,7 +77,6 @@ class CataRepositoryImpl(
                             }
                         }
 
-                        // Enviem la llista JA COMPLETADA cap al ViewModel
                         trySend(catesCompletades)
                     }
                 }

@@ -1,6 +1,41 @@
 <resources>
-    <string name="app_name">CatesivinsJC</string>
+    <string name="app_name">CatesiVins</string>
+    
+    <!-- Navegació -->
     <string name="bottom_nav_home">Inici</string>
     <string name="bottom_nav_mapa">Mapa</string>
     <string name="bottom_nav_perfil">Perfil</string>
+    
+    <!-- Autenticació -->
+    <string name="signup_title">Crea el teu compte</string>
+    <string name="login_title">Inicia sessió</string>
+    
+    <string name="email_label">Correu electrònic</string>
+    <string name="password_label">Contrasenya</string>
+    <string name="name_label">Nom i Cognoms</string>
+    
+    <string name="register_button">Registrar-se</string>
+    <string name="login_button">Entrar</string>
+    
+    <string name="forgot_password">Has oblidat la contrasenya?</string>
+    
+    <!-- Missatges -->
+    <string name="login_error">Error d\'inici de sessió: </string>
+    <string name="login_ok">Benvingut/da de nou!</string>
+    <string name="register_ok">Registre completat amb èxit!</string>
+    <string name="fill_all_fields">Omple tots els camps</string>
+
+    <!-- Enllaços per canviar de pantalla -->
+    <string name="no_account_text">No tens compte? Registra\'t</string>
+    <string name="already_account_text">Ja tens compte? Inicia sessió</string>
+    
+    <!-- Perfil -->
+    <string name="profile_title">El Meu Perfil</string>
+    <string name="profile_name">Nom</string>
+    <string name="profile_email">Email</string>
+    <string name="logout_button">Tancar Sessió</string>
+    <string name="logout_message">Sessió tancada</string>
+    <string name="no_name_defined">Sense nom definit</string>
+    <string name="detalls_cata">Detalls de la cata</string>
+    <string name="error_detalls_de_la_cata">Error descarregant detalls de la cata</string>
 </resources>

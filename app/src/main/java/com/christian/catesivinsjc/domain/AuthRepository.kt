@@ -5,7 +5,10 @@ import com.google.firebase.auth.FirebaseUser
 
 interface AuthRepository {
     // Registre
-    suspend fun register(email: String, password: String): Result<FirebaseUser?>
+    suspend fun register(email: String, password: String, nom: String): Result<FirebaseUser?>
+
+    //Login
+    suspend fun login(email: String, password: String): Result<FirebaseUser?>
     
     // Obtenció de l'usuari autenticat actual (de Firebase Auth)
     fun getCurrentUser(): FirebaseUser?

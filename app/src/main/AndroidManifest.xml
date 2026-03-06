@@ -4,6 +4,9 @@
 
     <!-- Permís d'Internet (ja el teníem) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Permís de localització -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- AFEGEIX AIXÒ: Permet veure i parlar amb els serveis de Google -->
     <queries>
@@ -20,6 +23,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CatesivinsJC">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBp_ISr3G9uJ3yCeU9A0R4MLzR-btxSP18" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

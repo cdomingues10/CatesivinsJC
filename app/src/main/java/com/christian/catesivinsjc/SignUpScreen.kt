@@ -1,6 +1,7 @@
 package com.christian.catesivinsjc
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ fun SignUpScreen(
 ) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
+    val nom by viewModel.nom.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isSuccess by viewModel.isSuccess.collectAsState()
@@ -47,7 +50,7 @@ fun SignUpScreen(
     // Escolta els canvis d'estat: si el registre és correcte, navega a Home
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
-            Toast.makeText(context, "Registre completat amb èxit!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.register_ok), Toast.LENGTH_SHORT).show()
             // Naveguem al Home i eliminem la pantalla de registre de la pila enrere
             navController.navigate("home") {
                 popUpTo("signup") { inclusive = true }
@@ -71,17 +74,29 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Crea el teu compte",
+            text = stringResource(R.string.signup_title),
             style = MaterialTheme.typography.headlineMedium,
-            color = colorResource(id = R.color.bordeaux) // Utilitzem el teu color corporatiu
+            color = colorResource(id = R.color.copa)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Camp Nom
+        OutlinedTextField(
+            value = nom,
+            onValueChange = { viewModel.onNomChange(it) },
+            label = { Text(stringResource(R.string.name_label)) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Camp Email
         OutlinedTextField(
             value = email,
             onValueChange = { viewModel.onEmailChange(it) },
-            label = { Text("Correu electrònic") },
+            label = { Text(stringResource(R.string.email_label)) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true
@@ -89,12 +104,13 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Camp Password
         OutlinedTextField(
             value = password,
             onValueChange = { viewModel.onPasswordChange(it) },
-            label = { Text("Contrasenya") },
+            label = { Text(stringResource(R.string.password_label)) },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(), // Oculta el text
+            visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true
         )
@@ -102,7 +118,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (isLoading) {
-            CircularProgressIndicator(color = colorResource(id = R.color.bordeaux))
+            CircularProgressIndicator(color = colorResource(id = R.color.copa))
         } else {
             Button(
                 onClick = { viewModel.register() },
@@ -110,11 +126,25 @@ fun SignUpScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.bordeaux)
+                    containerColor = colorResource(id = R.color.copa)
                 )
             ) {
-                Text("Registrar-se")
+                Text(stringResource(R.string.register_button))
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Enllaç cap al Login (AFEGIT: Per si ja tenen compte)
+        Text(
+            text = stringResource(R.string.already_account_text),
+            color = Color.Gray,
+            modifier = Modifier.clickable {
+                navController.navigate("login") {
+                    // Evitem acumular pantalles
+                    popUpTo("signup") { inclusive = true }
+                }
+            }
+        )
     }
 }

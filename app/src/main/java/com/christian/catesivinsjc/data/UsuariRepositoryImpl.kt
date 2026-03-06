@@ -12,7 +12,8 @@ class UsuariRepositoryImpl(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : UsuariRepository {
 
-    private val colUsuaris = "usuaris"
+    // CANVIAT: Ara utilitzem "Usuaris" (amb majúscula)
+    private val colUsuaris = "Usuaris"
 
     override fun getUsuari(userId: String): Flow<Usuari?> = callbackFlow {
         val docRef = firestore.collection(colUsuaris).document(userId)

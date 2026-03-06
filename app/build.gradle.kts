@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
 }
 
@@ -42,7 +41,10 @@ android {
 }
 
 dependencies {
+    // 1. FIREBASE BOM (Això gestiona totes les versions de Firebase)
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
 
+    // 2. ANDROIDX / COMPOSE
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -52,7 +54,24 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.firebase.auth.ktx)
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // 3. FIREBASE (Sense versions, les dóna el BOM)
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-analytics")
+
+    // 4. GOOGLE PLAY SERVICES / MAPS
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.maps.android:maps-compose:4.3.0")
+
+    // 5. IMATGES
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // TEST
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -60,20 +79,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
-// Ensure this is a recent version
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth.ktx)
-    // TODO: Add the dependencies for Firebase products you want to use
-    // When using the BoM, don't specify versions in Firebase dependencies
-    implementation("com.google.firebase:firebase-analytics")//
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-auth")
-    //implementation("com.google.firebase:firebase-auth-ktx")
-    //implementation("com.google.firebase:firebase-crashlytics-ktx")
-
-    // Add the dependencies for any other desired Firebase products
-    // https://firebase.google.com/docs/android/setup#available-libraries
 }

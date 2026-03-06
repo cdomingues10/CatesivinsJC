@@ -20,6 +20,9 @@ class AuthViewModel(
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password.asStateFlow()
 
+    private val _nom = MutableStateFlow("")
+    val nom: StateFlow<String> = _nom.asStateFlow()
+
     // Estat de l'operació
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -39,13 +42,20 @@ class AuthViewModel(
         _password.value = newValue
     }
 
+    fun onNomChange(nom: String) {
+        _nom.value = nom
+    }
+
+
     // Funció principal de registre
     fun register() {
         val currentEmail = _email.value.trim()
         val currentPassword = _password.value.trim()
+        val currentNom = _nom.value.trim()
+
 
         // Validacions bàsiques
-        if (currentEmail.isEmpty() || currentPassword.isEmpty()) {
+        if (currentEmail.isEmpty() || currentPassword.isEmpty() || currentNom.isEmpty()) {
             _errorMessage.value = "Omple tots els camps"
             return
         }
@@ -59,7 +69,7 @@ class AuthViewModel(
             _isLoading.value = true
             _errorMessage.value = null
 
-            val result = authRepository.register(currentEmail, currentPassword)
+            val result = authRepository.register(currentEmail, currentPassword, currentNom)
 
             _isLoading.value = false
             
@@ -70,7 +80,33 @@ class AuthViewModel(
             }
         }
     }
-    
+    //la funcio login
+    fun login(){
+        val currentEmail = _email.value.trim()
+        val currentPassword = _password.value.trim()
+
+        if (currentEmail.isEmpty() || currentPassword.isEmpty()) {
+            _errorMessage.value = "Omple tots els camps"
+            return
+        }
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            // Cridem a la nova funció de login del repositori
+            val result = authRepository.login(currentEmail, currentPassword)
+
+            _isLoading.value = false
+
+            result.onSuccess {
+                _isSuccess.value = true
+            }.onFailure { error ->
+                _errorMessage.value = "Error d'inici de sessió: ${error.message}"
+            }
+
+        }
+    }
+
     // Reiniciar l'estat d'èxit (per si tornem a la pantalla)
     fun resetState() {
         _isSuccess.value = false

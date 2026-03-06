@@ -11,27 +11,41 @@ class AuthRepositoryImpl(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : AuthRepository {
+    
+    // CANVIAT: Ara utilitzem "Usuaris" (amb majúscula) per coincidir amb la teva base de dades
+    private val COL_USUARIS = "Usuaris"
 
-    override suspend fun register(email: String, password: String): Result<FirebaseUser?> {
+    // Registre
+    override suspend fun register(email: String, password: String, nom: String): Result<FirebaseUser?> {
         return try {
             // 1. Creem l'usuari a Authentication
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val user = authResult.user
 
-            // 2. Si va bé, guardem a Firestore a la col·lecció "Usuari" (amb majúscula)
+            // 2. Si va bé, guardem a Firestore a la col·lecció "Usuaris"
             if (user != null) {
                 val nouUsuari = Usuari(
                     userId = user.uid,
                     email = email,
-                    nom = "", // Deixem buit
-                    rol = "usuari", // Valor per defecte del teu model
+                    nom = nom,
+                    rol = "usuari",
                     fotoUrl = ""
                 )
 
-                // Guardem l'objecte directament. Firestore farà el mapatge automàticament.
-                firestore.collection("Usuari").document(user.uid).set(nouUsuari).await()
+                // Guardem l'objecte a la col·lecció correcta
+                firestore.collection(COL_USUARIS).document(user.uid).set(nouUsuari).await()
             }
             Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Login
+    override suspend fun login(email: String, password: String): Result<FirebaseUser?> {
+        return try {
+            val authResult = auth.signInWithEmailAndPassword(email, password).await()
+            Result.success(authResult.user)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -43,8 +57,8 @@ class AuthRepositoryImpl(
 
     override suspend fun getUserProfile(uid: String): Result<Usuari?> {
         return try {
-            // Llegim de la col·lecció "Usuari"
-            val snapshot = firestore.collection("Usuari").document(uid).get().await()
+            // Llegim de la col·lecció "Usuaris"
+            val snapshot = firestore.collection(COL_USUARIS).document(uid).get().await()
             val usuari = snapshot.toObject(Usuari::class.java)
             Result.success(usuari)
         } catch (e: Exception) {

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.CatesivinsJC" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.CatesivinsJC" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Canviem el fons de la pantalla de càrrega al color Copa -->
+        <item name="android:windowBackground">@color/copa</item>
+        
+        <!-- Opcional: Color de la barra d'estat a joc -->
+        <item name="android:statusBarColor">@color/copa</item>
+    </style>
 </resources>

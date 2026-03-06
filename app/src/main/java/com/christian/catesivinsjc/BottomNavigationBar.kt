@@ -2,7 +2,7 @@ package com.christian.catesivinsjc
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalBar
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
@@ -22,8 +22,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     NavigationBar {
-        val items = listOf("Home", "Mapa", "Perfil")
-        val icons = listOf(Icons.Default.Home, Icons.Default.Place, Icons.Default.Person)
+        val items = listOf("Cates", "Mapa", "Perfil")
+        
+        // ARA SÍ: Fem servir Icons.Default.LocalBar (la copa) gràcies a la llibreria nova
+        val icons = listOf(Icons.Default.LocalBar, Icons.Default.Place, Icons.Default.Person)
+        
         val routes = listOf("home", "mapa", "perfil")
 
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -38,26 +41,27 @@ fun BottomNavigationBar(navController: NavController) {
                     Icon(
                         imageVector = icons[index], 
                         contentDescription = item,
-                        modifier = Modifier.size(32.dp) // Augmentem la mida a 32dp
+                        modifier = Modifier.size(32.dp) 
                     ) 
                 },
                 label = { Text(item) },
                 selected = isSelected,
                 colors = NavigationBarItemDefaults.colors(
-                    // Només canviem el color dels elements SELECCIONATS pel nou color Bordeus
-                    selectedIconColor = colorResource(id = R.color.bordeaux),
-                    selectedTextColor = colorResource(id = R.color.bordeaux),
+                    // Només canviem el color dels elements SELECCIONATS pel nou color Copa
+                    selectedIconColor = colorResource(id = R.color.copa),
+                    selectedTextColor = colorResource(id = R.color.copa),
                     // També posem l'indicador (la pastilla de fons) del mateix color però transparent
-                    indicatorColor = colorResource(id = R.color.bordeaux).copy(alpha = 0.1f)
+                    indicatorColor = colorResource(id = R.color.copa).copy(alpha = 0.1f)
                 ),
                 onClick = {
+                    // Si l'usuari clica "Cates" (home) i ja estem a "home" o en un "cata_detall"
+                    // forcem que torni a la ruta base de la secció.
+                    val route = routes[index]
                     navController.navigate(routes[index]) {
                         popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+                            inclusive = false
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                        launchSingleTop = true }
                 }
             )
         }

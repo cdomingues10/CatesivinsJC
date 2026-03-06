@@ -12,17 +12,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.christian.catesivinsjc.ui.theme.CatesivinsJCTheme
 import com.google.firebase.auth.FirebaseAuth
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
+
+
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         
         enableEdgeToEdge()
@@ -42,13 +47,13 @@ fun MainScreen() {
 
     // Comprovem si l'usuari ja està loguejat per decidir on començar
     // Si hi ha usuari -> Home. Si no -> Sign Up
-    val startDestination = if (FirebaseAuth.getInstance().currentUser != null) "home" else "signup"
+    val startDestination = if (FirebaseAuth.getInstance().currentUser != null) "home" else "login"
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = { 
             // Ocultem la barra de navegació a la pantalla de registre
-            if (currentRoute != "signup") {
+            if (currentRoute != "signup" && currentRoute != "login") {
                 BottomNavigationBar(navController)
             }
         }
@@ -59,11 +64,18 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("signup") { SignUpScreen(navController) }
-            composable("home") { HomeScreen() }
-            composable("mapa") { MapScreen() }
-            
-            // AQUI ESTÀ EL CANVI: Connectem la ruta "perfil" amb la nova pantalla
+            composable("login") { LoginScreen(navController) }
+            composable("home") { HomeScreen(navController) }
+            composable("mapa") { MapScreen(navController) }
             composable("perfil") { PerfilScreen(navController) }
+            composable(
+                route = "cata_detall/{cataId}",
+                arguments = listOf(navArgument("cataId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                // Recuperem l'ID que hem passat per la ruta
+                val cataId = backStackEntry.arguments?.getString("cataId") ?: ""
+                CataDetailScreen(cataId = cataId, navController = navController)
+            }
         }
     }
 }
