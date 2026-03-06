@@ -2,7 +2,6 @@ package com.christian.catesivinsjc.model
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.GeoPoint
 
 data class Vi(
     @DocumentId
