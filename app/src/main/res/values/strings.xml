@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CatesiVins</string>
+    <string name="app_name">Cates i Vins</string>
     
     <!-- Navegació -->
     <string name="bottom_nav_home">Inici</string>
@@ -36,6 +36,36 @@
     <string name="logout_button">Tancar Sessió</string>
     <string name="logout_message">Sessió tancada</string>
     <string name="no_name_defined">Sense nom definit</string>
+    <string name="carregant_perfil">Carregant perfil o comprovant permisos...</string>
+    <string name="sense_nom">Sense nom</string>
+    <string name="sense_email">Sense email</string>
+    <string name="desc_avatar">Avatar</string>
+
+    <!-- Detall de la Cata -->
     <string name="detalls_cata">Detalls de la cata</string>
     <string name="error_detalls_de_la_cata">Error descarregant detalls de la cata</string>
+    <string name="desc_imatge_bodega">Imatge de %1$s</string>
+    <string name="desc_imatge_vi">Imatge del vi %1$s</string>
+    <string name="titol_experiencia">L\'Experiència</string>
+    <string name="data_desconeguda">Data desconeguda</string>
+    <string name="titol_que_inclou">Que inclou:</string>
+    <string name="titol_ubicacio">Ubicació</string>
+    <string name="titol_seleccio_vins">Selecció de Vins</string>
+    <string name="opinio_usuari_pregunta">Què t\'ha semblat la cata?</string>
+    <string name="opinio_usuari_titol">La teua opinió</string>
+    <string name="placeholder_comentari">Escriu el teu comentari (opcional)...</string>
+    <string name="boto_publicar">Publicar</string>
+    <string name="boto_actualitzar">Actualitzar</string>
+    <string name="titol_opinions">Opinions dels tastadors</string>
+    <string name="sense_opinions">Encara no hi ha opinions. Sigues el primer!</string>
+    <string name="desc_back">Enrere</string>
+    <string name="desc_copa">Copa</string>
+    <string name="desc_lloc">Lloc</string>
+    <string name="data_per_confirmar">Data per confirmar</string>
+
+    <!-- Mapa -->
+    <string name="mapa_titol_properes">Experiències properes</string>
+    <string name="mapa_subtitol_properes">Troba la millor cata prop de tu</string>
+    <string name="unitat_metres">%1$d m</string>
+    <string name="unitat_kilomtres">%1$.1f km</string>
 </resources>

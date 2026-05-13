@@ -2,6 +2,7 @@ package com.christian.catesivinsjc.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.Exclude
 
 
 data class ValoracionsCata(
@@ -13,6 +14,8 @@ data class ValoracionsCata(
 
 // 👈 Referència a qui avalua
     val userId: String = "",
+    @get:Exclude
+    var nomUsuari: String = "Usuari desconegut",
 
 // Dades de la valoració de l'esdeveniment
     val puntuacioGeneral: Int = 0,     // Nota (ej. 1-5)

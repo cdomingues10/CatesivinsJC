@@ -13,7 +13,5 @@ data class Bodega(
     var Correu: String = "",
     val Ubicacio: String = "",
     val Geo: GeoPoint? = null,
-
-
-
+    val Imatgebod: String = ""
 )

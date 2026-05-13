@@ -73,16 +73,17 @@ fun PerfilScreen(
         )
 
         if (usuari == null) {
-            // Si l'usuari tarda a carregar o hi ha un error de permisos
             CircularProgressIndicator(color = colorResource(id = R.color.copa))
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Carregant perfil o comprovant permisos...", style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = stringResource(R.string.carregant_perfil), 
+                style = MaterialTheme.typography.bodySmall
+            )
         } else {
-            // MOSTRAR IMATGE (Si en té, la carrega de Storage, si no, icona per defecte)
             if (!usuari!!.fotoUrl.isNullOrEmpty()) {
                 AsyncImage(
                     model = usuari!!.fotoUrl,
-                    contentDescription = "Avatar",
+                    contentDescription = stringResource(R.string.desc_avatar),
                     modifier = Modifier
                         .size(120.dp)
                         .clip(CircleShape),
@@ -91,7 +92,7 @@ fun PerfilScreen(
             } else {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Avatar",
+                    contentDescription = stringResource(R.string.desc_avatar),
                     modifier = Modifier.size(120.dp),
                     tint = Color.Gray
                 )
@@ -99,14 +100,13 @@ fun PerfilScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Dades de l'usuari (Evitem els !! que fan petar l'app)
             ProfileItem(
                 label = stringResource(R.string.profile_name), 
-                value = usuari?.nom?.ifEmpty { stringResource(R.string.no_name_defined) } ?: "Sense nom"
+                value = usuari?.nom?.ifEmpty { stringResource(R.string.no_name_defined) } ?: stringResource(R.string.sense_nom)
             )
             ProfileItem(
                 label = stringResource(R.string.profile_email), 
-                value = usuari?.email ?: "Sense email"
+                value = usuari?.email ?: stringResource(R.string.sense_email)
             )
 
             Spacer(modifier = Modifier.weight(1f))

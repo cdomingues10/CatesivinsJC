@@ -3,6 +3,8 @@ package com.christian.catesivinsjc
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -14,6 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -34,6 +40,9 @@ import com.christian.catesivinsjc.viewmodel.CataDetailViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.style.TextOverflow
+import com.christian.catesivinsjc.model.ValoracionsCata
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,21 +57,32 @@ fun CataDetailScreen(
     val cata by viewModel.cata.collectAsState()
     val bodega by viewModel.bodega.collectAsState()
     val vins by viewModel.vins.collectAsState()
-
+    val valoracions by viewModel.valoracions.collectAsState()
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    val laMeuaValoracio = valoracions.find { it.userId == currentUserId } // Troba la valoració de l'usuari actual
+    var puntuacio by remember(laMeuaValoracio) { mutableIntStateOf(laMeuaValoracio?.puntuacioGeneral ?: 0) }
+    var comentari by remember(laMeuaValoracio) { mutableStateOf(laMeuaValoracio?.comentariGeneral ?: "") }
     val mainColor = colorResource(id = R.color.copa)
 
     Scaffold(
         topBar = {
             TopAppBar(
+                // FORCEM WINDOW INSETS A ZERO per eliminar l'espai buit superior
+                windowInsets = WindowInsets(0, 0, 0, 0),
                 title = { 
                     Text(
-                        text = cata?.nom ?: stringResource(R.string.detalls_cata),
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        text = bodega?.Nom ?: cata?.nom ?: stringResource(R.string.detalls_cata),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     ) 
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack, 
+                            contentDescription = stringResource(R.string.desc_back), 
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -78,95 +98,215 @@ fun CataDetailScreen(
             .fillMaxSize()
             .background(Color(0xFFFDFDFD))
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
         ) {
             
-            cata?.let { currentCata ->
-                Text(
-                    text = "L'Experiència",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = mainColor,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.CalendarToday, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            val dateFormatted = try {
-                                SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(currentCata.data)
-                            } catch (e: Exception) { "Data desconeguda" }
-                            Text(text = dateFormatted, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(text = currentCata.descripcio, style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
+            // --- IMATGE DE CAPÇALERA (BODEGA) ---
 
             bodega?.let { currentBodega ->
+                if (currentBodega.Imatgebod.isNotEmpty()) {
+                    AsyncImage(
+                        model = currentBodega.Imatgebod,
+                        contentDescription = stringResource(R.string.desc_imatge_bodega, currentBodega.Nom),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                
+                cata?.let { currentCata ->
+                    Text(
+                        text = stringResource(R.string.titol_experiencia),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = mainColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.CalendarToday, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                val dateFormatted = try {
+                                    SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(currentCata.data)
+                                } catch (e: Exception) { stringResource(R.string.data_desconeguda) }
+                                Text(text = dateFormatted, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(text = currentCata.descripcio, style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                            
+                            if (currentCata.inclou.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = stringResource(R.string.titol_que_inclou),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = Color.DarkGray,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+
+                                currentCata.inclou.forEach { item ->
+                                    Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(top = 4.dp)) {
+                                        Icon(
+                                            imageVector = Icons.Default.WineBar,
+                                            contentDescription = null,
+                                            tint = mainColor,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = item,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = Color.DarkGray
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                bodega?.let { currentBodega ->
+                    Text(
+                        text = stringResource(R.string.titol_ubicacio),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = mainColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Storefront, null, tint = mainColor, modifier = Modifier.size(24.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(text = currentBodega.Nom, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            }
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF5F5F5))
+                            InfoRow(icon = Icons.Default.LocationOn, text = currentBodega.Ubicacio)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            InfoRow(icon = Icons.Default.Phone, text = currentBodega.Telefon.toString())
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
                 Text(
-                    text = "Ubicació",
+                    text = stringResource(R.string.titol_seleccio_vins),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = mainColor,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                if (vins.isNotEmpty()) {
+                    vins.forEach { vi ->
+                        ViCard(vi = vi, mainColor = mainColor)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                //Si hem valorat, no apareix el formulari, si no, apareix per a puntuar
+                if(laMeuaValoracio == null) {
+                    //formulari d'edicio de valoracions
+                    Text(
+                        text = stringResource(R.string.opinio_usuari_pregunta),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = mainColor,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                    )
+
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = mainColor.copy(alpha = 0.05f)),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            // Les copes per a puntuar
+                            RatingCopes(puntuacio = puntuacio) { novaNota -> puntuacio = novaNota }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Camp de text per al comentari
+                            OutlinedTextField(
+                                value = comentari,
+                                onValueChange = { comentari = it },
+                                placeholder = {
+                                    Text(
+                                        stringResource(R.string.placeholder_comentari),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                maxLines = 3,
+                                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = mainColor)
+                            )
+
+                            Button(
+                                onClick = {
+                                    viewModel.guardarOActualitzarValoracio(
+                                        puntuacio,
+                                        comentari
+                                    )
+                                },
+                                enabled = puntuacio > 0, // Només activem si ha triat almenys una copa
+                                modifier = Modifier.align(Alignment.End).padding(top = 12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = mainColor)
+                            ) {
+                                Text(stringResource(R.string.boto_publicar))
+                            }
+                        }
+                    }
+                }
+                Text(
+                    text = stringResource(R.string.titol_opinions),
                     style = MaterialTheme.typography.titleMedium,
                     color = mainColor,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.WineBar, null, tint = mainColor, modifier = Modifier.size(24.dp))
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(text = currentBodega.Nom, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                if (valoracions.isNotEmpty()) {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(bottom = 8.dp)
+                    ) {
+                        items(valoracions) { valo ->
+                            ValoracioItem(valoracio = valo, mainColor = mainColor)
                         }
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF5F5F5))
-                        InfoRow(icon = Icons.Default.LocationOn, text = currentBodega.Ubicacio)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        InfoRow(icon = Icons.Default.Phone, text = currentBodega.Telefon.toString())
                     }
+                } else {
+                    Text(
+                        text = stringResource(R.string.sense_opinions),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        fontStyle = FontStyle.Italic,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
                 }
+                
+                Spacer(modifier = Modifier.height(40.dp))
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = "Selecció de Vins",
-                style = MaterialTheme.typography.headlineSmall,
-                color = mainColor,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            if (vins.isNotEmpty()) {
-                vins.forEach { vi ->
-                    ViCard(vi = vi, mainColor = mainColor)
-                }
-            } else {
-                Text(
-                    text = "Encara no hi ha vins assignats a aquesta cata.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    fontStyle = FontStyle.Italic,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }
@@ -178,8 +318,8 @@ fun ViCard(vi: Vi, mainColor: Color) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .shadow(
-                elevation = 8.dp, 
-                shape = RoundedCornerShape(16.dp), 
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
                 spotColor = mainColor.copy(alpha = 0.2f)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -191,18 +331,18 @@ fun ViCard(vi: Vi, mainColor: Color) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Contenidor de la imatge amb l'efecte de l'ampolla "flotant"
             Box(
                 modifier = Modifier.size(90.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Ombra suau sota l'ampolla
-                Canvas(modifier = Modifier.size(45.dp).offset(y = 40.dp)) {
+                Canvas(modifier = Modifier
+                    .size(45.dp)
+                    .offset(y = 40.dp)) {
                     drawOval(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                Color.Black.copy(alpha = 0.15f), // Centre més fosc
-                                Color.Transparent               // S'esvaeix cap a fora
+                                Color.Black.copy(alpha = 0.15f),
+                                Color.Transparent
                             ),
                             center = center,
                             radius = size.width / 2
@@ -213,7 +353,7 @@ fun ViCard(vi: Vi, mainColor: Color) {
                 if (vi.Imatgeurl.isNotEmpty()) {
                     AsyncImage(
                         model = vi.Imatgeurl,
-                        contentDescription = "Imatge del vi ${vi.Nom}",
+                        contentDescription = stringResource(R.string.desc_imatge_vi, vi.Nom),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Fit
                     )
@@ -229,7 +369,6 @@ fun ViCard(vi: Vi, mainColor: Color) {
 
             Spacer(modifier = Modifier.width(20.dp))
 
-            // Textos detallats
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = vi.Nom,
@@ -264,5 +403,73 @@ fun InfoRow(icon: ImageVector, text: String) {
         Icon(icon, null, tint = Color.Gray, modifier = Modifier.size(18.dp))
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = text, style = MaterialTheme.typography.bodyMedium, color = Color(0xFF444444))
+    }
+}
+
+@Composable
+fun ValoracioItem(valoracio: ValoracionsCata, mainColor: Color) {
+    Card(
+        modifier = Modifier
+            .width(320.dp)
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.AccountCircle, 
+                    null, 
+                    tint = mainColor.copy(alpha = 0.5f),
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = valoracio.nomUsuari,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                Row {
+                    repeat(5) { index ->
+                        Icon(
+                            imageVector = Icons.Default.WineBar,
+                            contentDescription = null,
+                            tint = if (index < valoracio.puntuacioGeneral) colorResource(id = R.color.copa) else Color.LightGray,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+
+            if (valoracio.comentariGeneral.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = valoracio.comentariGeneral,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray,
+                    maxLines = 3
+                )
+            }
+        }
+    }
+}
+@Composable
+fun RatingCopes(puntuacio: Int, onPuntuacioChange: (Int) -> Unit) {
+    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+        repeat(5) { index ->
+            val activa = index < puntuacio
+            IconButton(onClick = { onPuntuacioChange(index + 1) }) {
+                Icon(
+                    imageVector = if (activa) Icons.Default.WineBar else Icons.Default.WineBar,
+                    contentDescription = null,
+                    tint = if (activa) colorResource(id = R.color.copa) else Color.LightGray,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
     }
 }

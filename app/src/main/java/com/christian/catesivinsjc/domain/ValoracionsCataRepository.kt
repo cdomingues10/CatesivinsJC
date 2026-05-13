@@ -10,4 +10,6 @@ interface ValoracionsCataRepository {
      * @return Un Flow que emet la llista de valoracions cada cop que hi ha canvis.
      */
     fun obtenirValoracionsPerCata(cataId: String): Flow<List<ValoracionsCata>>
+
+    suspend fun guardarValoracio(valoracio: ValoracionsCata)
 }

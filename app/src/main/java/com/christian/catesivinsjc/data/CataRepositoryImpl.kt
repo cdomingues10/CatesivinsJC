@@ -30,11 +30,10 @@ class CataRepositoryImpl(
 
                 if (snapshot != null) {
                     launch {
-                        // 1. Convertim documents a objectes Cata protegint-nos d'errors de format
+                        // 1. Convertim documents a objectes Cata
                         val catesList = snapshot.documents.mapNotNull { document ->
                             try {
                                 document.toObject(Cata::class.java)?.apply {
-                                    // Guardem l'ID del document manualment per si de cas
                                     cataId = document.id 
                                 }
                             } catch (e: Exception) {
@@ -43,23 +42,23 @@ class CataRepositoryImpl(
                             }
                         }
 
-                        // 2. Omplim la informació de les Bodegues
+                        // 2. Omplim la informació de les Bodegues (inclosa la imatge)
                         val catesCompletades = catesList.map { cata ->
                             if (cata.ubicacio != null) {
                                 try {
                                     val bodegaSnapshot = cata.ubicacio!!.get().await()
                                     
-                                    // RECORDA: Aquí has de posar els noms EXACTES de la teva BD
-                                    // Si a Firestore és "Nom", posa "Nom". Si és "nom", posa "nom".
                                     val nomBodega = bodegaSnapshot.getString("Nom") ?: "Nom desconegut"
                                     val direccioBodega = bodegaSnapshot.getString("Ubicacio") ?: "Adreça desconeguda"
                                     val geo = bodegaSnapshot.getGeoPoint("Geo") ?: GeoPoint(0.0, 0.0)
+                                    val imatgeBodega = bodegaSnapshot.getString("Imatgebod") ?: ""
 
 
                                     cata.apply { 
                                         this.nomBodega = nomBodega 
                                         this.direccioBodega = direccioBodega
                                         this.coordenades = geo
+                                        this.imatgeBodega = imatgeBodega
                                     }
                                 } catch (e: Exception) {
                                     Log.e("CataRepository", "Error buscant bodega: ${e.message}")

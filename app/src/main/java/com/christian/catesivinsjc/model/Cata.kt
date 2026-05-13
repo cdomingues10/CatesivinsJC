@@ -11,6 +11,7 @@ data class Cata (
     var cataId: String = "",
     var data: Date = Date(),
     var descripcio: String = "",
+    var inclou: List<String> = emptyList(),
     var nom: String = "",
     
     // Referència a la base de dades (punter a la Bodega)
@@ -27,6 +28,9 @@ data class Cata (
     var direccioBodega: String = "",
 
     @get:Exclude
-    var coordenades: GeoPoint? = null
+    var coordenades: GeoPoint? = null,
+
+    @get:Exclude
+    var imatgeBodega: String = ""
 
 )
