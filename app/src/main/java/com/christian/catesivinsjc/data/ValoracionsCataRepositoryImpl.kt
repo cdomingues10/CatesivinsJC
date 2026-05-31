@@ -15,10 +15,10 @@ class ValoracionsCataRepositoryImpl(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : ValoracionsCataRepository {
 
-    //implementem la funcio de guardarvaloracions
+    // Funció per a guardar o actualitzar una valoració
     override suspend fun guardarValoracio(valoracio: ValoracionsCata) {
 
-        //ID combinant cata i usuari
+        // Generem una ID única combinant l'ID de l'usuari i de la cata
         val idDocument = "${valoracio.userId}_${valoracio.cataId}"
         firestore.collection(colValoracionsCata)
             .document(idDocument)
@@ -46,7 +46,8 @@ class ValoracionsCataRepositoryImpl(
                         val valoracions = snapshot.documents.mapNotNull { document ->
                             document.toObject(ValoracionsCata::class.java)
                         }
-                        //Anem a extraure els noms d'usuari
+                        
+                        // Busquem el nom real de cada usuari per a mostrar-lo a l'opinió
                         val valoracionsCompletades = valoracions.map { valoracio ->
                             try {
                                 val usuariSnapshot = firestore.collection("Usuaris")

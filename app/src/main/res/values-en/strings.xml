@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">Cates i Vins</string>
+
+    <!-- Navigation -->
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_mapa">Map</string>
+    <string name="bottom_nav_perfil">Profile</string>
+
+    <!-- Authentication -->
+    <string name="signup_title">Create your account</string>
+    <string name="login_title">Log in</string>
+
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="name_label">Full Name</string>
+
+    <string name="register_button">Register</string>
+    <string name="login_button">Log in</string>
+
+    <string name="forgot_password">Forgot password?</string>
+
+    <!-- Messages -->
+    <string name="login_error">Login error: </string>
+    <string name="login_ok">Welcome back!</string>
+    <string name="register_ok">Registration completed successfully!</string>
+    <string name="fill_all_fields">Fill all fields</string>
+
+    <!-- Links -->
+    <string name="no_account_text">Don\'t have an account? Sign up</string>
+    <string name="already_account_text">Already have an account? Log in</string>
+
+    <!-- Profile -->
+    <string name="profile_title">My Profile</string>
+    <string name="profile_name">Name</string>
+    <string name="profile_email">Email</string>
+    <string name="logout_button">Log out</string>
+    <string name="logout_message">Logged out</string>
+    <string name="no_name_defined">No name defined</string>
+    <string name="carregant_perfil">Loading profile or checking permissions...</string>
+    <string name="sense_nom">No name</string>
+    <string name="sense_email">No email</string>
+    <string name="desc_avatar">Avatar</string>
+
+    <!-- Tasting Detail -->
+    <string name="detalls_cata">Tasting Details</string>
+    <string name="error_detalls_de_la_cata">Error downloading tasting details</string>
+    <string name="desc_imatge_bodega">%1$s image</string>
+    <string name="desc_imatge_vi">%1$s wine image</string>
+    <string name="titol_experiencia">The Experience</string>
+    <string name="data_desconeguda">Unknown date</string>
+    <string name="titol_que_inclou">What\'s included:</string>
+    <string name="titol_ubicacio">Location</string>
+    <string name="titol_seleccio_vins">Wine Selection</string>
+    <string name="opinio_usuari_pregunta">What did you think of the tasting?</string>
+    <string name="opinio_usuari_titol">Your opinion</string>
+    <string name="placeholder_comentari">Write your comment (optional)...</string>
+    <string name="boto_publicar">Publish</string>
+    <string name="boto_actualitzar">Update</string>
+    <string name="titol_opinions">Tasters\' opinions</string>
+    <string name="sense_opinions">No opinions yet. Be the first!</string>
+    <string name="desc_back">Back</string>
+    <string name="desc_copa">Glass</string>
+    <string name="desc_lloc">Place</string>
+    <string name="data_per_confirmar">Date to be confirmed</string>
+    <string name="boto_reservar">Book my place</string>
+    <string name="reserva_ok">Booking successful!</string>
+
+    <!-- Map -->
+    <string name="mapa_titol_properes">Nearby Experiences</string>
+    <string name="mapa_subtitol_properes">Find the best tasting near you</string>
+    <string name="unitat_metres">%1$d m</string>
+    <string name="unitat_kilomtres">%1$.1f km</string>
+</resources>

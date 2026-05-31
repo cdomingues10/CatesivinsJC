@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">Cates i Vins</string>
+
+    <!-- Navegación -->
+    <string name="bottom_nav_home">Inicio</string>
+    <string name="bottom_nav_mapa">Mapa</string>
+    <string name="bottom_nav_perfil">Perfil</string>
+
+    <!-- Autenticación -->
+    <string name="signup_title">Crea tu cuenta</string>
+    <string name="login_title">Inicia sesión</string>
+
+    <string name="email_label">Correo electrónico</string>
+    <string name="password_label">Contraseña</string>
+    <string name="name_label">Nombre y Apellidos</string>
+
+    <string name="register_button">Registrarse</string>
+    <string name="login_button">Entrar</string>
+
+    <string name="forgot_password">¿Has olvidado la contraseña?</string>
+
+    <!-- Mensajes -->
+    <string name="login_error">Error de inicio de sesión: </string>
+    <string name="login_ok">¡Bienvenido/a de nuevo!</string>
+    <string name="register_ok">¡Registro completado con éxito!</string>
+    <string name="fill_all_fields">Rellena todos los campos</string>
+
+    <!-- Enlaces para cambiar de pantalla -->
+    <string name="no_account_text">¿No tienes cuenta? Regístrate</string>
+    <string name="already_account_text">¿Ya tienes cuenta? Inicia sesión</string>
+
+    <!-- Perfil -->
+    <string name="profile_title">Mi Perfil</string>
+    <string name="profile_name">Nombre</string>
+    <string name="profile_email">Email</string>
+    <string name="logout_button">Cerrar Sesión</string>
+    <string name="logout_message">Sesión cerrada</string>
+    <string name="no_name_defined">Sin nombre definido</string>
+    <string name="carregant_perfil">Cargando perfil o comprobando permisos...</string>
+    <string name="sense_nom">Sin nombre</string>
+    <string name="sense_email">Sin email</string>
+    <string name="desc_avatar">Avatar</string>
+
+    <!-- Detalle de la Cata -->
+    <string name="detalls_cata">Detalles de la cata</string>
+    <string name="error_detalls_de_la_cata">Error descargando detalles de la cata</string>
+    <string name="desc_imatge_bodega">Imagen de %1$s</string>
+    <string name="desc_imatge_vi">Imagen del vino %1$s</string>
+    <string name="titol_experiencia">La Experiencia</string>
+    <string name="data_desconeguda">Fecha desconocida</string>
+    <string name="titol_que_inclou">Qué incluye:</string>
+    <string name="titol_ubicacio">Ubicación</string>
+    <string name="titol_seleccio_vins">Selección de Vinos</string>
+    <string name="opinio_usuari_pregunta">¿Qué te ha parecido la cata?</string>
+    <string name="opinio_usuari_titol">Tu opinión</string>
+    <string name="placeholder_comentari">Escribe tu comentario (opcional)...</string>
+    <string name="boto_publicar">Publicar</string>
+    <string name="boto_actualitzar">Actualizar</string>
+    <string name="titol_opinions">Opiniones de los catadores</string>
+    <string name="sense_opinions">Aún no hay opiniones. ¡Sé el primero!</string>
+    <string name="desc_back">Atrás</string>
+    <string name="desc_copa">Copa</string>
+    <string name="desc_lloc">Lugar</string>
+    <string name="data_per_confirmar">Fecha por confirmar</string>
+    <string name="boto_reservar">Reservar mi plaza</string>
+    <string name="reserva_ok">¡Reserva realizada con éxito!</string>
+
+    <!-- Mapa -->
+    <string name="mapa_titol_properes">Experiencias cercanas</string>
+    <string name="mapa_subtitol_properes">Encuentra la mejor cata cerca de ti</string>
+    <string name="unitat_metres">%1$d m</string>
+    <string name="unitat_kilomtres">%1$.1f km</string>
+</resources>

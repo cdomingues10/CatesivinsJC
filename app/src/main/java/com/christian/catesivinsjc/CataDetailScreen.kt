@@ -1,5 +1,6 @@
 package com.christian.catesivinsjc
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -51,6 +53,9 @@ fun CataDetailScreen(
     navController: NavController,
     viewModel: CataDetailViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    
+    // Carreguem les dades quan canvia el cataId
     LaunchedEffect(cataId) {
         viewModel.loadCataDetails(cataId)
     }
@@ -59,7 +64,7 @@ fun CataDetailScreen(
     val vins by viewModel.vins.collectAsState()
     val valoracions by viewModel.valoracions.collectAsState()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-    val laMeuaValoracio = valoracions.find { it.userId == currentUserId } // Troba la valoració de l'usuari actual
+    val laMeuaValoracio = valoracions.find { it.userId == currentUserId }
     var puntuacio by remember(laMeuaValoracio) { mutableIntStateOf(laMeuaValoracio?.puntuacioGeneral ?: 0) }
     var comentari by remember(laMeuaValoracio) { mutableStateOf(laMeuaValoracio?.comentariGeneral ?: "") }
     val mainColor = colorResource(id = R.color.copa)
@@ -67,7 +72,6 @@ fun CataDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                // FORCEM WINDOW INSETS A ZERO per eliminar l'espai buit superior
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 title = { 
                     Text(
@@ -100,8 +104,6 @@ fun CataDetailScreen(
             .verticalScroll(rememberScrollState())
         ) {
             
-            // --- IMATGE DE CAPÇALERA (BODEGA) ---
-
             bodega?.let { currentBodega ->
                 if (currentBodega.Imatgebod.isNotEmpty()) {
                     AsyncImage(
@@ -115,9 +117,7 @@ fun CataDetailScreen(
                 }
             }
 
-
             Column(modifier = Modifier.padding(16.dp)) {
-                
                 cata?.let { currentCata ->
                     Text(
                         text = stringResource(R.string.titol_experiencia),
@@ -134,6 +134,7 @@ fun CataDetailScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
+                            // Dades de la cata: Data i Descripció
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.CalendarToday, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -145,6 +146,7 @@ fun CataDetailScreen(
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(text = currentCata.descripcio, style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
                             
+                            // Llista del que inclou l'experiència
                             if (currentCata.inclou.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
@@ -170,6 +172,23 @@ fun CataDetailScreen(
                                         )
                                     }
                                 }
+                            }
+
+                            // BOTÓ DE RESERVA (Ràpid i senzill)
+                            Button(
+                                onClick = { 
+                                    viewModel.reservarCata()
+                                    Toast.makeText(context, context.getString(R.string.reserva_ok), Toast.LENGTH_SHORT).show()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 24.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = mainColor),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.ConfirmationNumber, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.boto_reservar))
                             }
                         }
                     }
@@ -216,6 +235,7 @@ fun CataDetailScreen(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
+                // Mostrar la selecció de vins si n'hi ha
                 if (vins.isNotEmpty()) {
                     vins.forEach { vi ->
                         ViCard(vi = vi, mainColor = mainColor)
@@ -224,9 +244,8 @@ fun CataDetailScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                //Si hem valorat, no apareix el formulari, si no, apareix per a puntuar
+                // Secció per a que l'usuari puga valorar (si no ho ha fet ja)
                 if(laMeuaValoracio == null) {
-                    //formulari d'edicio de valoracions
                     Text(
                         text = stringResource(R.string.opinio_usuari_pregunta),
                         style = MaterialTheme.typography.titleMedium,
@@ -241,12 +260,8 @@ fun CataDetailScreen(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            // Les copes per a puntuar
                             RatingCopes(puntuacio = puntuacio) { novaNota -> puntuacio = novaNota }
-
                             Spacer(modifier = Modifier.height(8.dp))
-
-                            // Camp de text per al comentari
                             OutlinedTextField(
                                 value = comentari,
                                 onValueChange = { comentari = it },
@@ -260,15 +275,9 @@ fun CataDetailScreen(
                                 maxLines = 3,
                                 colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = mainColor)
                             )
-
                             Button(
-                                onClick = {
-                                    viewModel.guardarOActualitzarValoracio(
-                                        puntuacio,
-                                        comentari
-                                    )
-                                },
-                                enabled = puntuacio > 0, // Només activem si ha triat almenys una copa
+                                onClick = { viewModel.guardarOActualitzarValoracio(puntuacio, comentari) },
+                                enabled = puntuacio > 0,
                                 modifier = Modifier.align(Alignment.End).padding(top = 12.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = mainColor)
                             ) {
@@ -277,6 +286,7 @@ fun CataDetailScreen(
                         }
                     }
                 }
+
                 Text(
                     text = stringResource(R.string.titol_opinions),
                     style = MaterialTheme.typography.titleMedium,
@@ -285,6 +295,7 @@ fun CataDetailScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                // Llistat d'opinions d'altres tastadors
                 if (valoracions.isNotEmpty()) {
                     LazyRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -304,7 +315,6 @@ fun CataDetailScreen(
                         modifier = Modifier.padding(vertical = 16.dp)
                     )
                 }
-                
                 Spacer(modifier = Modifier.height(40.dp))
             }
         }
@@ -313,6 +323,7 @@ fun CataDetailScreen(
 
 @Composable
 fun ViCard(vi: Vi, mainColor: Color) {
+    // Targeta visual per a cada vi
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -326,30 +337,23 @@ fun ViCard(vi: Vi, mainColor: Color) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Icona i dades del vi (Nom, Tipus, Any)
             Box(
                 modifier = Modifier.size(90.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Canvas(modifier = Modifier
-                    .size(45.dp)
-                    .offset(y = 40.dp)) {
+                Canvas(modifier = Modifier.size(45.dp).offset(y = 40.dp)) {
                     drawOval(
                         brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color.Black.copy(alpha = 0.15f),
-                                Color.Transparent
-                            ),
+                            colors = listOf(Color.Black.copy(alpha = 0.15f), Color.Transparent),
                             center = center,
                             radius = size.width / 2
                         )
                     )
                 }
-                
                 if (vi.Imatgeurl.isNotEmpty()) {
                     AsyncImage(
                         model = vi.Imatgeurl,
@@ -358,39 +362,16 @@ fun ViCard(vi: Vi, mainColor: Color) {
                         contentScale = ContentScale.Fit
                     )
                 } else {
-                    Icon(
-                        imageVector = Icons.Default.LocalBar,
-                        contentDescription = null,
-                        tint = Color.LightGray,
-                        modifier = Modifier.size(45.dp)
-                    )
+                    Icon(Icons.Default.LocalBar, null, tint = Color.LightGray, modifier = Modifier.size(45.dp))
                 }
             }
-
             Spacer(modifier = Modifier.width(20.dp))
-
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = vi.Nom,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Serif,
-                    color = Color(0xFF2C2C2C)
-                )
-                Text(
-                    text = "${vi.Tipus} • ${vi.Any}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = mainColor,
-                    fontWeight = FontWeight.Medium
-                )
+                Text(vi.Nom, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Serif, color = Color(0xFF2C2C2C))
+                Text("${vi.Tipus} • ${vi.Any}", style = MaterialTheme.typography.bodyMedium, color = mainColor, fontWeight = FontWeight.Medium)
                 if (vi.Descripcio.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = vi.Descripcio,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        maxLines = 2
-                    )
+                    Text(vi.Descripcio, style = MaterialTheme.typography.bodySmall, color = Color.Gray, maxLines = 2)
                 }
             }
         }
@@ -409,66 +390,37 @@ fun InfoRow(icon: ImageVector, text: String) {
 @Composable
 fun ValoracioItem(valoracio: ValoracionsCata, mainColor: Color) {
     Card(
-        modifier = Modifier
-            .width(320.dp)
-            .padding(vertical = 4.dp),
+        modifier = Modifier.width(320.dp).padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.AccountCircle, 
-                    null, 
-                    tint = mainColor.copy(alpha = 0.5f),
-                    modifier = Modifier.size(28.dp)
-                )
+                Icon(Icons.Default.AccountCircle, null, tint = mainColor.copy(alpha = 0.5f), modifier = Modifier.size(28.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = valoracio.nomUsuari,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
+                Text(valoracio.nomUsuari, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 Row {
                     repeat(5) { index ->
-                        Icon(
-                            imageVector = Icons.Default.WineBar,
-                            contentDescription = null,
-                            tint = if (index < valoracio.puntuacioGeneral) colorResource(id = R.color.copa) else Color.LightGray,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(Icons.Default.WineBar, null, tint = if (index < valoracio.puntuacioGeneral) colorResource(id = R.color.copa) else Color.LightGray, modifier = Modifier.size(16.dp))
                     }
                 }
             }
-
             if (valoracio.comentariGeneral.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = valoracio.comentariGeneral,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.DarkGray,
-                    maxLines = 3
-                )
+                Text(valoracio.comentariGeneral, style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray, maxLines = 3)
             }
         }
     }
 }
+
 @Composable
 fun RatingCopes(puntuacio: Int, onPuntuacioChange: (Int) -> Unit) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
         repeat(5) { index ->
             val activa = index < puntuacio
             IconButton(onClick = { onPuntuacioChange(index + 1) }) {
-                Icon(
-                    imageVector = if (activa) Icons.Default.WineBar else Icons.Default.WineBar,
-                    contentDescription = null,
-                    tint = if (activa) colorResource(id = R.color.copa) else Color.LightGray,
-                    modifier = Modifier.size(32.dp)
-                )
+                Icon(Icons.Default.WineBar, null, tint = if (activa) colorResource(id = R.color.copa) else Color.LightGray, modifier = Modifier.size(32.dp))
             }
         }
     }

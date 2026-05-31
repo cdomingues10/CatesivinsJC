@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId = "com.christian.catesivinsjc"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -41,8 +41,8 @@ android {
 }
 
 dependencies {
-    // 1. FIREBASE BOM (Això gestiona totes les versions de Firebase)
-    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    // 1. FIREBASE BOM
+    implementation(platform(libs.firebase.bom))
 
     // 2. ANDROIDX / COMPOSE
     implementation(libs.androidx.core.ktx)
@@ -56,17 +56,17 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation("androidx.compose.material:material-icons-extended")
 
-    // 3. FIREBASE (Sense versions, les dóna el BOM)
+    // 3. FIREBASE
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-analytics")
 
     // 4. GOOGLE PLAY SERVICES / MAPS
-    implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.maps.android:maps-compose:4.3.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.android.gms:play-services-auth:21.6.0")
+    implementation("com.google.android.gms:play-services-maps:20.0.0")
+    implementation("com.google.maps.android:maps-compose:8.3.0")
 
     // 5. IMATGES
     implementation("io.coil-kt:coil-compose:2.5.0")

@@ -68,7 +68,7 @@ fun MapScreen(
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
     }
 
-    // Funció per calcular la distància
+    // Funció per calcular la distància entre l'usuari i la cata
     fun calcularDistancia(cataLat: Double, cataLon: Double): String {
         val usuari = userLocation ?: return ""
         val results = FloatArray(1)
@@ -85,6 +85,7 @@ fun MapScreen(
         }
     }
 
+    // Actualitzem la posició de l'usuari si tenim els permisos
     LaunchedEffect(hasLocationPermission) {
         if (hasLocationPermission) {
             try {
@@ -160,6 +161,7 @@ fun MapScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            // Configuració del mapa de Google
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,

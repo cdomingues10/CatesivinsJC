@@ -50,6 +50,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(navController: androidx.navigation.NavController, cataViewModel: CataViewModel = viewModel()) {
 
+    // Carreguem la llista de cates en entrar
     LaunchedEffect(Unit) {
         cataViewModel.getCates()
     }
@@ -108,6 +109,7 @@ fun HomeScreen(navController: androidx.navigation.NavController, cataViewModel: 
 
 @Composable
 fun CataItem(cata: Cata, onClick: () -> Unit) {
+    // Card per a cada cata de la llista
     Card(
         onClick = onClick,
         modifier = Modifier
@@ -136,7 +138,7 @@ fun CataItem(cata: Cata, onClick: () -> Unit) {
             Column(
                 modifier = Modifier.padding(20.dp)
             ) {
-                // 1. CAPÇALERA
+                // Info principal: Nom i icona
                 Row(
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -161,7 +163,7 @@ fun CataItem(cata: Cata, onClick: () -> Unit) {
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                // 2. UBICACIÓ
+                // Ubicació de la bodega
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Place,
@@ -191,7 +193,7 @@ fun CataItem(cata: Cata, onClick: () -> Unit) {
                 Divider(color = Color(0xFFF0F0F0))
                 Spacer(modifier = Modifier.height(12.dp))
                 
-                // 3. DESCRIPCIÓ
+                // Descripció curta de l'experiència
                 Text(
                     text = cata.descripcio, 
                     style = MaterialTheme.typography.bodyMedium,
@@ -203,7 +205,7 @@ fun CataItem(cata: Cata, onClick: () -> Unit) {
                 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 4. DATA
+                // Data de la cata (formatejada)
                 val formattedDate = try {
                     SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault()).format(cata.data)
                         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }

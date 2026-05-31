@@ -62,6 +62,8 @@
     <string name="desc_copa">Copa</string>
     <string name="desc_lloc">Lloc</string>
     <string name="data_per_confirmar">Data per confirmar</string>
+    <string name="boto_reservar">Reservar la meua plaça</string>
+    <string name="reserva_ok">Reserva realitzada amb èxit!</string>
 
     <!-- Mapa -->
     <string name="mapa_titol_properes">Experiències properes</string>

@@ -3,10 +3,13 @@ package com.christian.catesivinsjc.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.christian.catesivinsjc.data.CataRepositoryImpl
 import com.christian.catesivinsjc.data.ValoracionsCataRepositoryImpl
+import com.christian.catesivinsjc.domain.CataRepository
 import com.christian.catesivinsjc.domain.ValoracionsCataRepository
 import com.christian.catesivinsjc.model.Bodega
 import com.christian.catesivinsjc.model.Cata
+import com.christian.catesivinsjc.model.Reserva
 import com.christian.catesivinsjc.model.ValoracionsCata
 import com.christian.catesivinsjc.model.Vi
 import com.google.android.gms.tasks.Tasks
@@ -35,23 +38,22 @@ class CataDetailViewModel : ViewModel() {
 
     private val valoracionsCataRepository: ValoracionsCataRepository =
         ValoracionsCataRepositoryImpl()
+    
+    private val cataRepository: CataRepository = CataRepositoryImpl()
 
     private val _valoracions = MutableStateFlow<List<ValoracionsCata>>(emptyList())
     val valoracions: StateFlow<List<ValoracionsCata>> = _valoracions
 
     fun loadCataDetails(cataId: String) {
         viewModelScope.launch {
-            // Carrega la llista de valoracions de cata en temps real
             valoracionsCataRepository.obtenirValoracionsPerCata(cataId).collect { llista ->
                 _valoracions.value = llista
                 try {
-                    // 1. Descarregar la cata
                     val cataDoc = firestore.collection("Cates").document(cataId).get().await()
                     val cataObj = cataDoc.toObject(Cata::class.java)
                     _cata.value = cataObj
 
                     if (cataObj != null) {
-                        // 2. Descarregar la bodega
                         if (cataObj.ubicacio != null) {
                             try {
                                 val bodegaDoc = cataObj.ubicacio!!.get().await()
@@ -61,17 +63,13 @@ class CataDetailViewModel : ViewModel() {
                             }
                         }
 
-                        // 3. DESCARREGAR ELS VINS USANT viRef
                         val referencies = cataObj.viRef
                         if (!referencies.isNullOrEmpty()) {
                             try {
-                                // Càrrega paral·lela de tots els vins
                                 val tasks = referencies.map { it.get() }
                                 val documents = Tasks.whenAllSuccess<DocumentSnapshot>(tasks).await()
                                 val llistaVins = documents.mapNotNull { it.toObject(Vi::class.java) }
-
                                 _vins.value = llistaVins
-                                Log.d("CataDetailViewModel", "Vins carregats via viRef: ${llistaVins.size}")
                             } catch (e: Exception) {
                                 Log.e("CataDetailViewModel", "Error carregant vins via viRef", e)
                             }
@@ -113,9 +111,29 @@ class CataDetailViewModel : ViewModel() {
                     dataValoracio = com.google.firebase.Timestamp.now()
                 )
                 valoracionsCataRepository.guardarValoracio(novaValoracio)
-                Log.d("CataDetailViewModel", "Valoració guardada correctament")
             } catch (e: Exception) {
                 Log.e("CataDetailViewModel", "Error al guardar valoració", e)
+            }
+        }
+    }
+
+    fun reservarCata() {
+        val cataActual = cata.value ?: return
+        val userId = auth.currentUser?.uid ?: return
+
+        viewModelScope.launch {
+            try {
+                val novaReserva = Reserva(
+                    cataId = cataActual.cataId,
+                    userId = userId,
+                    nomCata = cataActual.nom,
+                    dataCata = com.google.firebase.Timestamp(cataActual.data),
+                    estat = "Confirmada"
+                )
+                cataRepository.ferReserva(novaReserva)
+                Log.d("CataDetailViewModel", "Reserva realitzada amb èxit")
+            } catch (e: Exception) {
+                Log.e("CataDetailViewModel", "Error en realitzar reserva", e)
             }
         }
     }
