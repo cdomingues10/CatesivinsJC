@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface CataRepository {
     fun obtenirCates(): Flow<List<Cata>>
     suspend fun ferReserva(reserva: Reserva)
+    suspend fun haReservat(userId: String, cataId: String): Boolean
 }

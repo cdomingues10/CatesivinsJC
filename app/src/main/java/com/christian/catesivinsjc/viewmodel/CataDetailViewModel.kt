@@ -36,6 +36,9 @@ class CataDetailViewModel : ViewModel() {
     private val _vins = MutableStateFlow<List<Vi>>(emptyList())
     val vins: StateFlow<List<Vi>> = _vins
 
+    private val _jaHaReservat = MutableStateFlow(false)
+    val jaHaReservat: StateFlow<Boolean> = _jaHaReservat
+
     private val valoracionsCataRepository: ValoracionsCataRepository =
         ValoracionsCataRepositoryImpl()
     
@@ -45,7 +48,11 @@ class CataDetailViewModel : ViewModel() {
     val valoracions: StateFlow<List<ValoracionsCata>> = _valoracions
 
     fun loadCataDetails(cataId: String) {
+        val userId = auth.currentUser?.uid
         viewModelScope.launch {
+            if (userId != null) {
+                _jaHaReservat.value = cataRepository.haReservat(userId, cataId)
+            }
             valoracionsCataRepository.obtenirValoracionsPerCata(cataId).collect { llista ->
                 _valoracions.value = llista
                 try {
@@ -134,6 +141,7 @@ class CataDetailViewModel : ViewModel() {
                     estat = "Confirmada"
                 )
                 cataRepository.ferReserva(novaReserva)
+                _jaHaReservat.value = true
                 Log.d("CataDetailViewModel", "Reserva per a $numPersones persones realitzada amb èxit")
             } catch (e: Exception) {
                 Log.e("CataDetailViewModel", "Error en realitzar reserva", e)

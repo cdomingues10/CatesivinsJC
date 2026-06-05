@@ -73,12 +73,31 @@ class CataRepositoryImpl(
 
     override suspend fun ferReserva(reserva: Reserva) {
         try {
+            // Verificar si ja existeix una reserva per a aquest usuari i cata
+            if (haReservat(reserva.userId, reserva.cataId)) {
+                throw Exception("Ja tens una reserva per a aquesta cata.")
+            }
+
             Log.d("CataRepository", "Intentant guardar reserva per a cata: ${reserva.cataId}, usuari: ${reserva.userId}")
             val docRef = firestore.collection("Reserves").add(reserva).await()
             Log.d("CataRepository", "Reserva guardada amb èxit! ID: ${docRef.id}")
         } catch (e: Exception) {
             Log.e("CataRepository", "ERROR al crear reserva a Firestore: ${e.message}", e)
             throw e
+        }
+    }
+
+    override suspend fun haReservat(userId: String, cataId: String): Boolean {
+        return try {
+            val query = firestore.collection("Reserves")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("cataId", cataId)
+                .get()
+                .await()
+            !query.isEmpty
+        } catch (e: Exception) {
+            Log.e("CataRepository", "Error comprovant reserva existent: ${e.message}")
+            false
         }
     }
 }
