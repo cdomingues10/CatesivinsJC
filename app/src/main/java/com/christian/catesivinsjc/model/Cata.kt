@@ -20,6 +20,9 @@ data class Cata (
     // ARRAY DE REFERÈNCIES: Llista de vins vinculats directament
     var viRef: List<DocumentReference>? = null,
 
+    // Capacitat màxima de la cata (per defecte 20)
+    var placesTotals: Int = 20,
+
     // Camps EXCLOSOS de Firestore (només per a la pantalla)
     @get:Exclude 
     var nomBodega: String = "Carregant...",

@@ -10,6 +10,7 @@ data class Reserva(
     val userId: String = "",
     val nomCata: String = "",
     val dataCata: Timestamp? = null,
+    val numPersones: Int = 1, // Número de persones de la reserva (Màxim 4)
     val dataReserva: Timestamp = Timestamp.now(),
-    val estat: String = "Confirmada" // Per a un projecte, millor que estiga confirmada directament
+    val estat: String = "Confirmada"
 )

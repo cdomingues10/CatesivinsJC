@@ -46,7 +46,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.christian.catesivinsjc.model.ValoracionsCata
 import com.google.firebase.auth.FirebaseAuth
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CataDetailScreen(
     cataId: String,
@@ -65,6 +64,10 @@ fun CataDetailScreen(
     val valoracions by viewModel.valoracions.collectAsState()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
     val laMeuaValoracio = valoracions.find { it.userId == currentUserId }
+    
+    // Estats per a la reserva
+    var numPersonesSeleccionades by remember { mutableIntStateOf(1) }
+    
     var puntuacio by remember(laMeuaValoracio) { mutableIntStateOf(laMeuaValoracio?.puntuacioGeneral ?: 0) }
     var comentari by remember(laMeuaValoracio) { mutableStateOf(laMeuaValoracio?.comentariGeneral ?: "") }
     val mainColor = colorResource(id = R.color.copa)
@@ -174,21 +177,68 @@ fun CataDetailScreen(
                                 }
                             }
 
-                            // BOTÓ DE RESERVA (Ràpid i senzill)
+                            Spacer(modifier = Modifier.height(24.dp))
+                            
+                            // SELECTOR DE PERSONES (1-4)
+                            Text(
+                                text = "Nombre de persones:",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.DarkGray
+                            )
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                IconButton(
+                                    onClick = { if (numPersonesSeleccionades > 1) numPersonesSeleccionades-- },
+                                    enabled = numPersonesSeleccionades > 1
+                                ) {
+                                    Icon(Icons.Default.Remove, contentDescription = "Menys", tint = mainColor)
+                                }
+                                
+                                Text(
+                                    text = numPersonesSeleccionades.toString(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 24.dp)
+                                )
+                                
+                                IconButton(
+                                    onClick = { if (numPersonesSeleccionades < 4) numPersonesSeleccionades++ },
+                                    enabled = numPersonesSeleccionades < 4
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = "Més", tint = mainColor)
+                                }
+                            }
+
+                            if (numPersonesSeleccionades == 4) {
+                                Text(
+                                    text = "Per a grups de més de 4 persones, contacteu per correu.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Gray,
+                                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+
+                            // BOTÓ DE RESERVA (Dinamitzat)
                             Button(
                                 onClick = { 
-                                    viewModel.reservarCata()
+                                    viewModel.reservarCata(numPersonesSeleccionades)
                                     Toast.makeText(context, context.getString(R.string.reserva_ok), Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 24.dp),
+                                    .padding(top = 8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = mainColor),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 Icon(Icons.Default.ConfirmationNumber, null)
                                 Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.boto_reservar))
+                                Text("Reservar per a $numPersonesSeleccionades ${if(numPersonesSeleccionades == 1) "persona" else "persones"}")
                             }
                         }
                     }

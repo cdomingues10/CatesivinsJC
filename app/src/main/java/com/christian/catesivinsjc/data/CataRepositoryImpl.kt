@@ -73,10 +73,11 @@ class CataRepositoryImpl(
 
     override suspend fun ferReserva(reserva: Reserva) {
         try {
-            firestore.collection("Reserves").add(reserva).await()
-            Log.d("CataRepository", "Reserva guardada a Firestore")
+            Log.d("CataRepository", "Intentant guardar reserva per a cata: ${reserva.cataId}, usuari: ${reserva.userId}")
+            val docRef = firestore.collection("Reserves").add(reserva).await()
+            Log.d("CataRepository", "Reserva guardada amb èxit! ID: ${docRef.id}")
         } catch (e: Exception) {
-            Log.e("CataRepository", "Error al crear reserva: ${e.message}")
+            Log.e("CataRepository", "ERROR al crear reserva a Firestore: ${e.message}", e)
             throw e
         }
     }

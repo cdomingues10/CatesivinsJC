@@ -33,7 +33,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     navController: androidx.navigation.NavController,

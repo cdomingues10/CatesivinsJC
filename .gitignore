@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Seguretat de Claus d'API i Firebase
+google-services.json
+**/google-services.json
+secrets.properties

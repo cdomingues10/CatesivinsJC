@@ -50,7 +50,9 @@ class CataDetailViewModel : ViewModel() {
                 _valoracions.value = llista
                 try {
                     val cataDoc = firestore.collection("Cates").document(cataId).get().await()
-                    val cataObj = cataDoc.toObject(Cata::class.java)
+                    val cataObj = cataDoc.toObject(Cata::class.java)?.apply { 
+                        this.cataId = cataDoc.id 
+                    }
                     _cata.value = cataObj
 
                     if (cataObj != null) {
@@ -117,7 +119,7 @@ class CataDetailViewModel : ViewModel() {
         }
     }
 
-    fun reservarCata() {
+    fun reservarCata(numPersones: Int) {
         val cataActual = cata.value ?: return
         val userId = auth.currentUser?.uid ?: return
 
@@ -128,10 +130,11 @@ class CataDetailViewModel : ViewModel() {
                     userId = userId,
                     nomCata = cataActual.nom,
                     dataCata = com.google.firebase.Timestamp(cataActual.data),
+                    numPersones = numPersones,
                     estat = "Confirmada"
                 )
                 cataRepository.ferReserva(novaReserva)
-                Log.d("CataDetailViewModel", "Reserva realitzada amb èxit")
+                Log.d("CataDetailViewModel", "Reserva per a $numPersones persones realitzada amb èxit")
             } catch (e: Exception) {
                 Log.e("CataDetailViewModel", "Error en realitzar reserva", e)
             }
