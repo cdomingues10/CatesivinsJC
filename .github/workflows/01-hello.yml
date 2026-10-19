@@ -2,7 +2,7 @@ name: 01 - hello
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   hello:
     runs-on: ubuntu-24.04
