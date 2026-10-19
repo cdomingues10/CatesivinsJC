@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
         - name: Saludar
-        run: echo "Hola, aço es github actions"
+          run: echo "Hola, aço es github actions"
 
         - name: Ver data del runner 
-        run: date
+          run: date
 
         - name: Ver info del sistema
-        run: ls -la
+          run: ls -la
