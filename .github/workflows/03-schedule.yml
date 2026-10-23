@@ -1,0 +1,14 @@
+name: 03 - schedule
+
+on:
+    schedule:
+       - cron: '* 1 * * '     #  every hour
+
+jobs:
+  schedule:
+    runs-on: ubuntu-24.04
+    steps:
+        - name: Saludar
+          run: echo "Hola, aço es una programacio cada hora"
+
+    
